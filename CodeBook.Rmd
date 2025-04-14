@@ -1,0 +1,216 @@
+---
+title: "CodeBook"
+author: "Alyssa Okon and Nuzaif Naveed"
+date: "2025-04-14"
+output: html_document
+---
+# CodeBook
+
+## Data Overview
+
+This dataset is derived from wearable computing data collected using a Samsung Galaxy S smartphone. The primary purpose of the data collection was to monitor and record human activity through embedded accelerometer and gyroscope sensors. The dataset originates from the "Human Activity Recognition Using Smartphones" project and includes measurements recorded from 30 volunteers performing six different activities:
+- **WALKING**
+- **WALKING_UPSTAIRS**
+- **WALKING_DOWNSTAIRS**
+- **SITTING**
+- **STANDING**
+- **LAYING**
+
+
+Each record in the dataset includes a 561-feature vector capturing various time and frequency domain variables. These features were computed after applying noise filters and segmenting the sensor signals into fixed-width sliding windows.
+
+**Source of Data:**  
+The original dataset can be downloaded from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones).
+
+**Purpose of the Data:**  
+The purpose of this dataset is to support the development and evaluation of algorithms for human activity recognition (HAR) using wearable sensor data. By collecting detailed measurements from smartphone accelerometers and gyroscopes while subjects perform common daily activities (e.g., walking, sitting, standing), this dataset provides a reliable foundation for building machine learning models that can classify or predict human movement in real-time. Such data is essential for advancing applications in health monitoring, fitness tracking, assisted living, and user context-awareness in mobile computing. It enables researchers and developers to create smarter, more responsive technologies that can understand and adapt to human behavior based on physical activity patterns. This tidy dataset can then be used for further statistical analyses or machine learning tasks.
+
+---
+
+## Variable Descriptions
+
+### General Variables
+- **subject**  
+  - **Description:** A unique identifier for each volunteer participating in the study.  
+  - **Data Type:** Integer  
+  - **Range:** 1 - 30
+
+- **activity**  
+  - **Description:** The activity performed by the subject during data collection.  
+  - **Data Type:** Factor (Categorical)  
+  - **Levels:** WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING  
+
+### Measurement Variables
+The dataset contains numerous sensor-based measurement variables. These variables are derived from accelerometer and gyroscope signals and typically represent either the mean or standard deviation of the signal measurements in various axes and domains.
+
+Some examples include:
+- **Time_Domain Variables** (prefix "Time_"):
+  - **Time_BodyAccelerometerMean_X:** Mean value of the body accelerometer signal along the X-axis (unit: g, where 1g ≈ 9.81 m/s²).
+  - **Time_BodyAccelerometerStd_Y:** Standard deviation of the body accelerometer signal along the Y-axis.
+  
+- **Frequency_Domain Variables** (prefix "Frequency_"):
+  - **Frequency_BodyAccelerometerMean_Z:** Mean value of the body accelerometer signal along the Z-axis after frequency transformation.
+  - **Frequency_BodyAccelerometerStd_X:** Standard deviation of the frequency-transformed body accelerometer signal along the X-axis.
+
+> **Note:** The complete dataset originally contained 561 features. For the purpose of this project, only features representing the mean and standard deviation were retained.
+
+**Units and Data Types:**  
+- Most sensor measurements are normalized and unitless, scaled within a range (typically between -1 and 1).
+- Variables derived from accelerometer readings use gravitational units (g) and those from the gyroscope use radians/second.
+
+---
+
+## Missing Data Handling
+
+No missing values were identified in the original dataset. The dataset creators took care to pre-process the raw sensor data into clean, complete time windows before releasing it.The data collection process ensured complete records for each measurement window. As a result, no imputation or removal of missing data was required during the data cleaning process.
+
+---
+
+## Data Processing
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+```
+
+```{r libraries}
+library(dplyr)
+library(tidyverse)
+```
+
+## Load Metadata
+
+```{r load-meta}
+features <- read.table("UCI HAR Dataset/features.txt", col.names = c("index", "feature"))
+activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt", col.names = c("label", "activity"))
+```
+
+## Load and Merge Data
+
+```{r load-merge}
+X_train <- read.table("UCI HAR Dataset/train/X_train.txt", col.names = features$feature)
+y_train <- read.table("UCI HAR Dataset/train/y_train.txt", col.names = "activity")
+subject_train <- read.table("UCI HAR Dataset/train/subject_train.txt", col.names = "subject")
+
+X_test <- read.table("UCI HAR Dataset/test/X_test.txt", col.names = features$feature)
+y_test <- read.table("UCI HAR Dataset/test/y_test.txt", col.names = "activity")
+subject_test <- read.table("UCI HAR Dataset/test/subject_test.txt", col.names = "subject")
+
+train_data <- cbind(subject_train, y_train, X_train)
+test_data <- cbind(subject_test, y_test, X_test)
+
+merged_data <- rbind(train_data, test_data)
+```
+
+## Filter Mean and Std Columns
+
+```{r select-columns}
+selected_columns <- grep("mean\\(\\)|std\\(\\)", features$feature, value = TRUE)
+selected_columns_clean <- make.names(selected_columns)
+
+tidy_data <- merged_data %>%
+  select(subject, activity, all_of(selected_columns_clean))
+```
+
+## Label Activities
+
+```{r label-activities}
+tidy_data$activity <- factor(tidy_data$activity, 
+                             levels = activity_labels$label, 
+                             labels = activity_labels$activity)
+```
+
+## Clean Variable Names (Snake Case)
+
+```{r clean-names}
+names(tidy_data) <- names(tidy_data) %>%
+  gsub("\\.", "_", .) %>%
+  gsub("^t", "time_", .) %>%
+  gsub("^f", "frequency_", .) %>%
+  gsub("Acc", "accelerometer", .) %>%
+  gsub("Gyro", "gyroscope", .) %>%
+  gsub("Mag", "magnitude", .) %>%
+  gsub("BodyBody", "Body", .) %>%
+  gsub("([a-z])([A-Z])", "\\1_\\2", .) %>%
+  tolower() %>%
+  gsub("_+", "_", .) %>%
+  gsub("_$", "", .)
+```
+
+## Create Final Tidy Dataset
+
+```{r final-tidy}
+final_tidy_data <- tidy_data %>%
+  group_by(subject, activity) %>%
+  summarise(across(everything(), mean), .groups = "drop")
+```
+
+## Save Output
+
+```{r save-output, eval=FALSE}
+write.table(final_tidy_data, "final_tidy_dataset.txt", row.name = FALSE)
+```
+
+The following steps were performed to clean and tidy the data:
+
+1. **Merging Datasets:**  
+   The training and test datasets were merged using the `rbind()` function after separately reading the training and test sets for subjects, activities, and features.
+
+2. **Extracting Mean and Standard Deviation Measurements:**  
+   - Feature names were filtered to include only those containing `mean()` or `std()`.
+   - Due to R’s automatic sanitization of variable names (e.g., converting `"tBodyAcc-mean()-X"` to `"tBodyAcc.mean...X"`), the `make.names()` function was used to align these names with the dataset’s column names.
+
+3. **Replacing Activity Codes:**  
+   Numeric activity codes were replaced with descriptive names using a mapping provided in `activity_labels.txt`.
+
+4. **Labeling Data with Descriptive Variable Names:**  
+   The variable names were cleaned to make them more descriptive:
+   - Prefix `t` was replaced with `Time_`.
+   - Prefix `f` was replaced with `Frequency_`.
+   - Abbreviations like `Acc`, `Gyro`, and `Mag` were replaced with full descriptive terms such as `Accelerometer`, `Gyroscope`, and `Magnitude`.
+   - Redundant text (e.g., repeated “Body”) was streamlined.
+
+5. **Creating the Final Tidy Dataset:**  
+   A final tidy dataset was generated by grouping the cleaned data by `subject` and `activity` and calculating the average of each measurement variable. This dataset represents the mean of each measurement for every subject-activity pair.
+
+## Code Instructions
+To run the data processing script and generate the tidy dataset:
+
+Environment Setup:
+
+Open R or RStudio.
+
+Set your working directory to the folder containing the UCI HAR Dataset.
+
+Script Execution:
+
+Ensure you have the necessary R packages installed (dplyr and tidyverse).
+Source the R script GroupWork.R by running source("GroupWork.R").
+
+The script will process the data and output final_tidy_dataset.txt in your working directory.
+
+Verifying the Data:
+
+Open final_tidy_dataset.txt in any text editor or import it into R using read.table() to confirm that the dataset is tidy and complete.
+
+***
+## Analysis Description
+**Current Analysis:**
+The primary analysis conducted in this project involved cleaning and transforming raw sensor data to produce a tidy dataset that summarizes the average measurement values for each activity and subject. This transformation facilitates further analysis, such as:
+
+Exploratory Data Analysis (EDA): Visualizing patterns and trends across different activities.
+
+Statistical Analysis: Conducting inferential tests to compare sensor measurements across activities.
+
+Machine Learning Applications: Using the tidy dataset as input for classification models to predict activity types based on sensor readings.
+
+**Planned Analysis:**
+Future analysis might include:
+
+Feature selection and dimensionality reduction techniques (e.g., PCA) to identify the most significant variables.
+
+Application of various machine learning algorithms to classify activities.
+
+Time series analysis to investigate how sensor signals change over time during different activities.
+
+---
+This CodeBook.md is intended to ensure that collaborators, instructors, and future users of the dataset have a complete understanding of the data, the cleaning process, and the analysis pipeline. Each section is designed to provide transparency and reproducibility in the data processing steps.Thank you!
