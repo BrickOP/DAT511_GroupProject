@@ -142,12 +142,16 @@ names(tidy_data) <- names(tidy_data) %>%
 final_tidy_data <- tidy_data %>%
   group_by(subject, activity) %>%
   summarise(across(everything(), mean), .groups = "drop")
+
+knitr::kable(head(final_tidy_data[, 1:5]), caption = "Preview of First 3 sensor-based measurement variables in Final Tidy Dataset")
 ```
+
 
 ## Save Output
 
-```{r save-output, eval=FALSE}
+```{r save-output, echo=TRUE, results='asis'}
 write.table(final_tidy_data, "final_tidy_dataset.txt", row.name = FALSE)
+cat("** File saved successfully to final_tidy_dataset.txt**\n")
 ```
 
 The following steps were performed to clean and tidy the data:

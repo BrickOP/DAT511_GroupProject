@@ -13,7 +13,7 @@
 
 <meta name="date" content="2025-04-14" />
 
-<title>CodeBook</title>
+<title>Code_Book</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,7 +350,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">CodeBook</h1>
+<h1 class="title toc-ignore">Code_Book</h1>
 <h4 class="author">Alyssa Okon and Nuzaif Naveed</h4>
 <h4 class="date">2025-04-14</h4>
 
@@ -543,79 +543,11 @@ tidy_data &lt;- merged_data %&gt;%
 <h2>Create Final Tidy Dataset</h2>
 <pre class="r"><code>final_tidy_data &lt;- tidy_data %&gt;%
   group_by(subject, activity) %&gt;%
-  summarise(across(everything(), mean), .groups = &quot;drop&quot;)
-
-knitr::kable(head(final_tidy_data[, 1:5]), caption = &quot;Preview of First 3 sensor-based measurement variables in Final Tidy Dataset&quot;)</code></pre>
-<table>
-<caption>Preview of First 3 sensor-based measurement variables in Final
-Tidy Dataset</caption>
-<colgroup>
-<col width="6%" />
-<col width="16%" />
-<col width="25%" />
-<col width="25%" />
-<col width="25%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="right">subject</th>
-<th align="left">activity</th>
-<th align="right">time_bodyaccelerometer_mean_x</th>
-<th align="right">time_bodyaccelerometer_mean_y</th>
-<th align="right">time_bodyaccelerometer_mean_z</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">WALKING</td>
-<td align="right">0.2773308</td>
-<td align="right">-0.0173838</td>
-<td align="right">-0.1111481</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="left">WALKING_UPSTAIRS</td>
-<td align="right">0.2554617</td>
-<td align="right">-0.0239531</td>
-<td align="right">-0.0973020</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">WALKING_DOWNSTAIRS</td>
-<td align="right">0.2891883</td>
-<td align="right">-0.0099185</td>
-<td align="right">-0.1075662</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="left">SITTING</td>
-<td align="right">0.2612376</td>
-<td align="right">-0.0013083</td>
-<td align="right">-0.1045442</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">STANDING</td>
-<td align="right">0.2789176</td>
-<td align="right">-0.0161376</td>
-<td align="right">-0.1106018</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="left">LAYING</td>
-<td align="right">0.2215982</td>
-<td align="right">-0.0405140</td>
-<td align="right">-0.1132036</td>
-</tr>
-</tbody>
-</table>
+  summarise(across(everything(), mean), .groups = &quot;drop&quot;)</code></pre>
 </div>
 <div id="save-output" class="section level2">
 <h2>Save Output</h2>
-<pre class="r"><code>write.table(final_tidy_data, &quot;final_tidy_dataset.txt&quot;, row.name = FALSE)
-cat(&quot;** File saved successfully to final_tidy_dataset.txt**\n&quot;)</code></pre>
-<p>** File saved successfully to final_tidy_dataset.txt**</p>
+<pre class="r"><code>write.table(final_tidy_data, &quot;final_tidy_dataset.txt&quot;, row.name = FALSE)</code></pre>
 <p>The following steps were performed to clean and tidy the data:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Merging Datasets:</strong><br />

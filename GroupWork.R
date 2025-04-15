@@ -3,7 +3,7 @@ rm(list = ls())
 #setwd("C:/Users/19all/Desktop/DAT511/UCI HAR Dataset") - Ally WD
 setwd("D:/MS Data Analytics/Fall 2024/DAT 511/Group Project/UCI HAR Dataset") 
 
-install.packages("tinytex")
+#install.packages("tinytex")
 #install.packages("dplyr")
 #install.packages("tidyverse")
 library(dplyr)
