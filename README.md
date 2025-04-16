@@ -7,11 +7,11 @@ output: pdf_document
 
 **Human Activity Recognition – Tidy Dataset Project**
 
-##Project Overview
+## Project Overview
 
 This repository contains a data cleaning and tidying project based on the UCI Human Activity Recognition Using Smartphones dataset. The dataset originates from experiments in which 30 subjects wore Samsung Galaxy S smartphones while performing six distinct activities (e.g., walking, sitting, standing). The raw data were collected from the embedded accelerometer and gyroscope sensors, resulting in a complex, multi-file dataset.
 
-##Project Objectives:
+## Project Objectives:
 
 -Merge Training and Test Sets: Combine the separate training and testing datasets into one unified dataset.
 
@@ -23,14 +23,14 @@ This repository contains a data cleaning and tidying project based on the UCI Hu
 
 -Create a Tidy Dataset: Generate a second dataset that contains the average of each variable for each subject-activity pair, making it ideal for subsequent analysis.
 
-##Repository Contents
+## Repository Contents
 File	Description
 GroupWork.R	Main R script that performs the complete data cleaning and transformation process.
 final_tidy_dataset.txt	The final, cleaned, and summarized tidy dataset, ready for further analysis.
 CodeBook.md	Detailed documentation of the dataset—descriptions of variables, units, transformations, and processing steps.
 README.md	This file: an overview of the project, step-by-step instructions for running the analysis, and details about the analysis process.
 
-##How to Run the Script
+## How to Run the Script
 Prerequisites
 R: Ensure that a recent version of R is installed.
 
